@@ -1,1 +1,1 @@
-Bluegem Finder with image processing
+CS2 Desert Eagle Bluegem Finder Using image processing
