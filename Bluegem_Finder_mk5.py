@@ -1,12 +1,9 @@
 import pytesseract
-from PIL import Image
 import pyautogui
 import time
 import cv2
 import pandas as pd
-from datetime import datetime
-from openpyxl import Workbook
-from openpyxl.styles import PatternFill
+
 
 # Tesseract yolu belirtmeniz gerekebilir
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'  # Windows için örnek yol
@@ -58,106 +55,82 @@ def extract_text_from_image(image_path):
     return paint_seeds
 
 
-def process_and_classify_paint_seeds(paint_seeds):
-    # Paint Seed'leri sınıflandır
-    classified_data = []
+# Ekran görüntüsü alma fonksiyonu
+def capture_full_screenshot():
+    # Ekran görüntüsünü al
+    screenshot = pyautogui.screenshot()
 
+    # Ekran görüntüsünü geçici bir dosyaya kaydet
+    file_name = "temp_screenshot.png"
+    screenshot.save(file_name)
+
+    # Dosya yolunu döndür
+    return file_name
+
+
+# Paint Seed'leri sınıflandırma
+def process_and_classify_paint_seeds(paint_seeds):
+    classified_data = []
     for seed in paint_seeds:
         if seed in de_pattern_1:
-            classified_data.append({"Paint Seed": seed, "Category": "Blue-Gem", "Color": "magenta"})
+            classified_data.append({"Paint Seed": seed, "Category": "Blue-Gem", "Color": "#00e1ff"})
         elif seed in de_rank_1:
-            classified_data.append({"Paint Seed": seed, "Category": "Rank 1", "Color": "magenta"})
+            classified_data.append({"Paint Seed": seed, "Category": "Rank 1", "Color": "#00e1ff"})
         elif seed in de_rank_2:
-            classified_data.append({"Paint Seed": seed, "Category": "Rank 2", "Color": "red"})
+            classified_data.append({"Paint Seed": seed, "Category": "Rank 2", "Color": "#1aff00"})
         elif seed in de_purple:
-            classified_data.append({"Paint Seed": seed, "Category": "Purple", "Color": "yellow"})
+            classified_data.append({"Paint Seed": seed, "Category": "Purple", "Color": "#8400ff"})
         elif seed in de_gold:
-            classified_data.append({"Paint Seed": seed, "Category": "Gold", "Color": "green"})
+            classified_data.append({"Paint Seed": seed, "Category": "Gold", "Color": "#fffb00"})
         else:
-            classified_data.append({"Paint Seed": seed, "Category": "Unknown", "Color": "white"})
-
+            classified_data.append({"Paint Seed": seed, "Category": "Unknown", "Color": "#FFFFFF"})
     return classified_data
 
 
-def save_to_excel(classified_data):
-    # Verileri pandas DataFrame'e dönüştür
+# Verileri CSV dosyasına kaydet
+def save_to_csv(classified_data):
+    # Verileri pandas DataFrame formatına dönüştür
     df = pd.DataFrame(classified_data)
 
-    # Yeni CSV dosya adı oluşturma (zaman damgası kullanarak her seferinde yeni dosya adı)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_name = f"bluegem_finder_{timestamp}.xlsx"
-
-    # Excel dosyasını oluştur
-    wb = Workbook()
-    ws = wb.active
-
-    # DataFrame'i Excel'e yaz
-    for row in dataframe_to_rows(df, index=False, header=True):
-        ws.append(row)
-
-    # Renklerin stilini belirleme
-    color_map = {
-        "magenta": "FF00FF",
-        "red": "FF0000",
-        "yellow": "FFFF00",
-        "green": "00FF00",
-        "white": "FFFFFF"
-    }
-
-    # Satırları renklendir
-    for row in ws.iter_rows(min_row=2, max_row=ws.max_row, min_col=1, max_col=3):  # Başlık satırını atla
-        category_cell = row[1]
-        color = category_cell.value.lower()
-
-        # Belirli renklere göre hücre rengi ayarla
-        fill = PatternFill(start_color=color_map.get(color, "FFFFFF"), end_color=color_map.get(color, "FFFFFF"),
-                           fill_type="solid")
-        for cell in row:
-            cell.fill = fill
-
-    # Excel dosyasına kaydet
-    wb.save(file_name)
+    # CSV dosyasına kaydet
+    file_name = f"bluegem_finder_{time.strftime('%Y%m%d%H%M%S')}.csv"
+    df.to_csv(file_name, index=False)
     print(f"Paint Seed verileri {file_name} dosyasına kaydedildi.")
-
-
-# Ekran görüntüsünü alma fonksiyonu
-def capture_full_screenshot():
-    screenshot = pyautogui.screenshot()  # PyAutoGUI ile ekran görüntüsünü al
-    screenshot_path = "screenshot.png"  # Kaydedilecek dosya yolu
-    screenshot.save(screenshot_path)  # Görüntüyü kaydet
-    return screenshot_path
-
 
 # Ana monitörün çözünürlüğü (örnek çözünürlük)
 screen_width = 1920  # Ana monitör genişliği
 screen_height = 1080  # Ana monitör yüksekliği
 
-
 # Sayfa kaydırma ve verileri işleme fonksiyonu
 def scroll_page_on_main_monitor():
-    # Paint Seed'lerini saklamak için bir liste oluştur
     paint_seed_list = []
 
-    # Monitörde kaydırma işlemi
-    for _ in range(10):  # 10 kez kaydırma yapacak
-        # Ekran görüntüsünü al
-        screenshot_path = capture_full_screenshot()
+    for _ in range(2):  # Sayfayı 15 kez kaydırıyoruz
+        pyautogui.moveTo(screen_width // 2, screen_height // 2)  # Ana monitörde ortalama bir yere tıkla
+        pyautogui.scroll(-500)  # Sayfayı kaydır
+        time.sleep(4)  # İçeriğin yüklenmesini beklemek için
 
-        # OCR ile Paint Seed verilerini çıkart
-        paint_seeds = extract_text_from_image(screenshot_path)
+        # Kaydırma sonrası ekran görüntüsü al
+        print(f"Kaydırma {_ + 1}. işlemi tamamlandı, ekran görüntüsü alınıyor...")
+        image_path = capture_full_screenshot()
 
-        # Paint Seed'leri sınıflandır
-        classified_data = process_and_classify_paint_seeds(paint_seeds)
+        # OCR ile Paint Seed bilgilerini çıkart
+        paint_seeds = extract_text_from_image(image_path)
 
-        # Sınıflandırılmış verileri kaydet
-        save_to_excel(classified_data)
+        if paint_seeds:
+            for seed in paint_seeds:
+                print(f"Paint Seed: {seed}")
+            # Sınıflandırılmış veriyi ekle
+            classified_data = process_and_classify_paint_seeds(paint_seeds)
+            paint_seed_list.extend(classified_data)
+        else:
+            print("Paint Seed bilgisi tespit edilemedi.")
 
-        # Sayfa kaydırma
-        pyautogui.scroll(-300)  # Aşağı kaydırma
+    print("Sayfa kaydırma tamamlandı.")
 
-        # Kısa süre bekleme
-        time.sleep(2)
+    # Verileri CSV dosyasına kaydet
+    save_to_csv(paint_seed_list)
 
 
-# Ana fonksiyon çalıştırma
+# Sayfayı kaydırarak tüm verileri işleyebilirsiniz
 scroll_page_on_main_monitor()
