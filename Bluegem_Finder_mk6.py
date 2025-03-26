@@ -127,7 +127,7 @@ def scroll_page_on_main_monitor():
 
     for _ in range(16):  # Sayfayı 15 kez kaydırıyoruz
         pyautogui.moveTo(screen_width // 2, screen_height // 2)  # Ana monitörde ortalama bir yere tıkla
-        pyautogui.scroll(-500)  # Sayfayı kaydır
+        pyautogui.scroll(-700)  # Sayfayı kaydır
         time.sleep(4)  # İçeriğin yüklenmesini beklemek için
 
         # Kaydırma sonrası ekran görüntüsü al
