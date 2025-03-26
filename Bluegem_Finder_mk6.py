@@ -92,6 +92,16 @@ def save_to_csv(classified_data):
     # Verileri pandas DataFrame formatına dönüştür
     df = pd.DataFrame(classified_data)
 
+    # 'Color' sütununu eklemek
+    color_mapping = {
+        "Blue-Gem": "Magenta",
+        "Rank 1": "Red",
+        "Rank 2": "Yellow",
+        "Purple": "Purple",
+        "Gold": "Gold"
+    }
+    df['Color'] = df['Category'].map(color_mapping).fillna('Unknown')  # Unknown olmayanlara renk ekle
+
     # CSV dosyasına kaydet
     file_name = f"bluegem_finder_{time.strftime('%Y%m%d%H%M%S')}.csv"
     df.to_csv(file_name, index=False)
@@ -106,6 +116,7 @@ def save_to_csv(classified_data):
         print(item)
 
 
+
 # Ana monitörün çözünürlüğü (örnek çözünürlük)
 screen_width = 1920  # Ana monitör genişliği
 screen_height = 1080  # Ana monitör yüksekliği
@@ -114,7 +125,7 @@ screen_height = 1080  # Ana monitör yüksekliği
 def scroll_page_on_main_monitor():
     paint_seed_list = []
 
-    for _ in range(2):  # Sayfayı 15 kez kaydırıyoruz
+    for _ in range(16):  # Sayfayı 15 kez kaydırıyoruz
         pyautogui.moveTo(screen_width // 2, screen_height // 2)  # Ana monitörde ortalama bir yere tıkla
         pyautogui.scroll(-500)  # Sayfayı kaydır
         time.sleep(4)  # İçeriğin yüklenmesini beklemek için
