@@ -123,10 +123,10 @@ screen_height = 1080  # Ana monitör yüksekliği
 def scroll_page_on_main_monitor():
     paint_seed_list = []
 
-    for _ in range(14):  # Sayfayıkaydırıyoruz
+    for _ in range(16):  # Sayfayıkaydırıyoruz
         pyautogui.moveTo(screen_width // 2, screen_height // 2)  # Ana monitörde ortalama bir yere tıkla
         pyautogui.scroll(-850)  # Sayfayı kaydır
-        time.sleep(4)  # İçeriğin yüklenmesini beklemek için
+        time.sleep(2)  # İçeriğin yüklenmesini beklemek için
 
         # Kaydırma sonrası ekran görüntüsü al
         print(f"Kaydırma {_ + 1}. işlemi tamamlandı, ekran görüntüsü alınıyor...")
