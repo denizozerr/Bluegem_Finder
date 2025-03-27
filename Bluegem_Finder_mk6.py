@@ -79,7 +79,7 @@ def process_and_classify_paint_seeds(paint_seeds):
         elif seed in de_rank_1:
             classified_data.append({"Paint Seed": seed, "Category": "Rank 1","type": "RANK 1!!!"})
         elif seed in de_rank_2:
-            classified_data.append({"Paint Seed": seed, "Category": "Rank 2"})
+            classified_data.append({"Paint Seed": seed, "Category": "Rank 2","type": "RANK 2!!!"})
         elif seed in de_purple:
             classified_data.append({"Paint Seed": seed, "Category": "Purple"})
         elif seed in de_gold:
@@ -125,9 +125,9 @@ screen_height = 1080  # Ana monitör yüksekliği
 def scroll_page_on_main_monitor():
     paint_seed_list = []
 
-    for _ in range(16):  # Sayfayı 15 kez kaydırıyoruz
+    for _ in range(16):  # Sayfayı 16 kez kaydırıyoruz
         pyautogui.moveTo(screen_width // 2, screen_height // 2)  # Ana monitörde ortalama bir yere tıkla
-        pyautogui.scroll(-700)  # Sayfayı kaydır
+        pyautogui.scroll(-850)  # Sayfayı kaydır
         time.sleep(4)  # İçeriğin yüklenmesini beklemek için
 
         # Kaydırma sonrası ekran görüntüsü al
